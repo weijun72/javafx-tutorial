@@ -1,5 +1,10 @@
+import java.io.IOException;
+import java.util.Collections;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
@@ -8,33 +13,37 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 
 /**
- * A dialog box containing a message and an avatar.
+ * Represents a dialog box consisting of an avatar and a text message.
  */
 public class DialogBox extends HBox {
 
-    private final Label text;
-    private final ImageView displayPicture;
+    @FXML
+    private Label dialog;
+    @FXML
+    private ImageView displayPicture;
 
-    public DialogBox(String message, Image image) {
-        text = new Label(message);
-        displayPicture = new ImageView(image);
+    private DialogBox(String text, Image image) {
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(MainWindow.class.getResource("/view/DialogBox.fxml"));
+            fxmlLoader.setController(this);
+            fxmlLoader.setRoot(this);
+            fxmlLoader.load();
+        } catch (IOException exception) {
+            throw new IllegalStateException("Unable to load the dialog box view", exception);
+        }
 
-        text.setWrapText(true);
-        displayPicture.setFitWidth(100.0);
-        displayPicture.setFitHeight(100.0);
-        setAlignment(Pos.TOP_RIGHT);
-
-        getChildren().addAll(text, displayPicture);
+        dialog.setText(text);
+        displayPicture.setImage(image);
     }
 
     /**
      * Flips this dialog box so the avatar is on the left and the text is on the right.
      */
     private void flip() {
-        setAlignment(Pos.TOP_LEFT);
         ObservableList<Node> children = FXCollections.observableArrayList(getChildren());
-        FXCollections.reverse(children);
+        Collections.reverse(children);
         getChildren().setAll(children);
+        setAlignment(Pos.TOP_LEFT);
     }
 
     public static DialogBox getUserDialog(String message, Image image) {
