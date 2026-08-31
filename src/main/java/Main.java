@@ -14,6 +14,7 @@ public class Main extends Application {
     private static final String DEFAULT_FILE_PATH = "duke/example.txt";
     private final Image userImage = new Image(getClass().getResourceAsStream("/images/DaUser.png"));
     private final Image dukeImage = new Image(getClass().getResourceAsStream("/images/DaDuke.png"));
+    private final Duke duke = new Duke();
 
     private ScrollPane scrollPane;
     private VBox dialogContainer;
@@ -38,9 +39,6 @@ public class Main extends Application {
 
         userInput = new TextField();
         sendButton = new Button("Send");
-
-        DialogBox dialogBox = new DialogBox("Hello!", userImage);
-        dialogContainer.getChildren().add(dialogBox);
 
         AnchorPane mainLayout = new AnchorPane();
         mainLayout.getChildren().addAll(scrollPane, userInput, sendButton);
@@ -70,5 +68,22 @@ public class Main extends Application {
 
         stage.setScene(scene);
         stage.show();
+
+        sendButton.setOnMouseClicked(event -> handleUserInput());
+        userInput.setOnAction(event -> handleUserInput());
+        dialogContainer.heightProperty().addListener(observable -> scrollPane.setVvalue(1.0));
+    }
+
+    /**
+     * Creates dialog boxes for the user's message and Duke's response, then clears the input field.
+     */
+    private void handleUserInput() {
+        String userText = userInput.getText();
+        String dukeText = duke.getResponse(userText);
+
+        dialogContainer.getChildren().addAll(
+                DialogBox.getUserDialog(userText, userImage),
+                DialogBox.getDukeDialog(dukeText, dukeImage));
+        userInput.clear();
     }
 }
